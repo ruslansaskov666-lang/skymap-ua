@@ -2,87 +2,233 @@
 <html lang="uk">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0b1020">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SkyMap UA</title>
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
 <style>
-*{box-sizing:border-box}html,body{margin:0;background:#070c16;color:#f5f7fb;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-body{min-height:100vh}.app{max-width:560px;margin:auto;min-height:100vh;background:#0c1322;display:flex;flex-direction:column}
-header{padding:16px 16px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.logo{display:flex;align-items:center;gap:10px}.shield{font-size:26px}.title{font-size:21px;font-weight:800}.sub{font-size:11px;color:#91a0b7;margin-top:2px}
-.status{display:flex;align-items:center;gap:7px;background:#15243a;border:1px solid #293c59;padding:9px 11px;border-radius:14px;font-size:11px;color:#b9c8dd}
-.dot{width:8px;height:8px;border-radius:50%;background:#45d483;box-shadow:0 0 10px #45d483}
-.mapwrap{margin:4px 12px 0;border-radius:20px;overflow:hidden;border:1px solid #263650;background:#111}
-#map{height:500px;width:100%}.leaflet-control-zoom{border:0!important}.leaflet-control-zoom a{background:#101b2d!important;color:#fff!important;border:1px solid #30415d!important}
-.leaflet-control-attribution{font-size:8px!important;background:#0b1220d9!important;color:#9aa8bb!important}.leaflet-control-attribution a{color:#b8c9e5!important}
-.alertbar{margin:10px 12px 0;background:#142238;border:1px solid #314560;border-radius:16px;padding:11px 13px;display:flex;justify-content:space-between;align-items:center;font-size:12px}
-.alertbar b{color:#ffcb5c}.count{font-weight:800;color:#fff}
-.content{padding:12px}.card{background:#111c2d;border:1px solid #253750;border-radius:17px;padding:14px;margin-bottom:10px}
-.card h3{margin:0 0 8px;font-size:15px}.row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #23324a;font-size:13px}.row:last-child{border-bottom:0}.safe{color:#55d98c}.warn{color:#ffca5c}
-nav{position:sticky;bottom:0;background:#0b1220f2;border-top:1px solid #25344d;display:grid;grid-template-columns:repeat(4,1fr);padding:7px 4px calc(7px + env(safe-area-inset-bottom));backdrop-filter:blur(14px)}
-nav button{background:transparent;padding:7px 2px;border-radius:12px;color:#93a2b9;font-size:11px}nav button.active{color:#fff;background:#18263c}.ico{font-size:20px;display:block;margin-bottom:2px}
-.note{font-size:10px;line-height:1.35;color:#8796ad;margin:0 2px 4px}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:#f2f4f7;
+  color:#111827;
+}
+header{
+  background:#0b1020;
+  color:white;
+  padding:18px 16px 14px;
+}
+h1{margin:0;font-size:28px}
+.sub{margin-top:5px;color:#cbd5e1}
+.online{margin-top:12px}
+.dot{
+  display:inline-block;
+  width:10px;
+  height:10px;
+  background:#22c55e;
+  border-radius:50%;
+  margin-right:8px;
+}
+#map{
+  height:52vh;
+  min-height:350px;
+}
+.card{
+  background:white;
+  margin:12px;
+  padding:16px;
+  border-radius:18px;
+  box-shadow:0 2px 10px #0001;
+}
+.card h2{
+  margin:0 0 8px;
+  font-size:21px;
+}
+.updated{
+  color:#64748b;
+  font-size:14px;
+}
+.region{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:13px 0;
+  border-bottom:1px solid #e5e7eb;
+}
+.region:last-child{border-bottom:0}
+.badge{
+  padding:7px 11px;
+  border-radius:12px;
+  font-weight:700;
+}
+.alert{background:#fee2e2;color:#991b1b}
+.partial{background:#fef3c7;color:#92400e}
+.calm{background:#dcfce7;color:#166534}
+.unknown{background:#e5e7eb;color:#475569}
+button{
+  border:0;
+  border-radius:12px;
+  padding:11px 15px;
+  background:#111827;
+  color:white;
+  font-size:16px;
+}
+nav{
+  position:sticky;
+  bottom:0;
+  display:flex;
+  background:white;
+  border-top:1px solid #ddd;
+}
+nav button{
+  flex:1;
+  background:white;
+  color:#334155;
+  border-radius:0;
+  padding:12px 4px;
+  font-size:13px;
+}
 </style>
 </head>
+
 <body>
-<div class="app">
+
 <header>
-  <div class="logo"><div class="shield">🛡️</div><div><div class="title">SkyMap UA</div><div class="sub">Цивільна карта повітряних тривог</div></div></div>
-  <div class="status"><span class="dot"></span>Система онлайн</div>
+  <h1>SkyMap UA</h1>
+  <div class="sub">Цивільна карта повітряних тривог</div>
+  <div class="online">
+    <span class="dot"></span>Система онлайн
+  </div>
 </header>
 
-<div class="mapwrap"><div id="map"></div></div>
+<div id="map"></div>
 
-<div class="alertbar"><span>🟢 <b>Стан тривог</b></span><span class="count" id="alertCount">Демо-дані</span></div>
-
-<section class="content" id="home">
-  <div class="card">
-    <h3>🇺🇦 Області</h3>
-    <div class="row"><span>Харківська область</span><span class="safe">спокійно</span></div>
-    <div class="row"><span>Київська область</span><span class="safe">спокійно</span></div>
-    <div class="row"><span>Львівська область</span><span class="safe">спокійно</span></div>
-    <div class="row"><span>Одеська область</span><span class="safe">спокійно</span></div>
-  </div>
-  <p class="note">Це цивільний прототип. Дані про військові цілі, точні маршрути та координати не відображаються. Карта використовує OpenStreetMap.</p>
-</section>
-
-<nav>
- <button class="active" onclick="showTab(this,'home')"><span class="ico">🗺️</span>Карта</button>
- <button onclick="showTab(this,'alerts')"><span class="ico">🔔</span>Тривоги</button>
- <button onclick="showTab(this,'stats')"><span class="ico">📊</span>Статистика</button>
- <button onclick="showTab(this,'settings')"><span class="ico">⚙️</span>Налаштування</button>
-</nav>
+<div class="card">
+  <h2>Стан тривог</h2>
+  <div class="updated" id="updated">Завантаження...</div>
+  <br>
+  <button onclick="loadAlerts()">Оновити</button>
 </div>
 
+<div class="card">
+  <h2>Області</h2>
+  <div id="regions">Завантаження...</div>
+</div>
+
+<nav>
+  <button>🗺️<br>Карта</button>
+  <button>🚨<br>Тривоги</button>
+  <button>📊<br>Статистика</button>
+  <button>⚙️<br>Налаштування</button>
+</nav>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
-const map=L.map('map',{zoomControl:true,attributionControl:true}).setView([49.0,31.2],6);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-  maxZoom:18,
-  attribution:'&copy; OpenStreetMap contributors'
-}).addTo(map);
+const API_BASE =
+  "https://rapid-snowflake-95a2.ruslansaskov666.workers.dev";
 
-// Безпечні демонстраційні області — не військові цілі.
-const demo=[
-  {name:'Харків',lat:49.99,lon:36.23,state:'Спокійно'},
-  {name:'Київ',lat:50.45,lon:30.52,state:'Спокійно'},
-  {name:'Львів',lat:49.84,lon:24.03,state:'Спокійно'},
-  {name:'Одеса',lat:46.48,lon:30.72,state:'Спокійно'},
-  {name:'Дніпро',lat:48.46,lon:35.05,state:'Спокійно'}
+const regions = [
+  "АР Крим",
+  "Вінницька",
+  "Волинська",
+  "Дніпропетровська",
+  "Донецька",
+  "Житомирська",
+  "Закарпатська",
+  "Запорізька",
+  "Івано-Франківська",
+  "Київська",
+  "Кіровоградська",
+  "Луганська",
+  "Львівська",
+  "Миколаївська",
+  "Одеська",
+  "Полтавська",
+  "Рівненська",
+  "Сумська",
+  "Тернопільська",
+  "Харківська",
+  "Херсонська",
+  "Хмельницька",
+  "Черкаська",
+  "Чернівецька",
+  "Чернігівська",
+  "Київ"
 ];
-demo.forEach(x=>{
-  L.circleMarker([x.lat,x.lon],{radius:7,color:'#45d483',fillColor:'#45d483',fillOpacity:.9,weight:2})
-   .addTo(map).bindPopup('<b>'+x.name+'</b><br>'+x.state);
-});
 
-function showTab(btn,id){
- document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
- btn.classList.add('active');
- if(id==='alerts') alert('Розділ «Тривоги» готовий для підключення офіційних регіональних статусів.');
- if(id==='stats') alert('Розділ статистики буде додано наступним кроком.');
- if(id==='settings') alert('Налаштування будуть додані наступним кроком.');
+const map = L.map("map").setView([49.0,31.0],6);
+
+L.tileLayer(
+  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {
+    attribution:"© OpenStreetMap contributors"
+  }
+).addTo(map);
+
+function statusInfo(code){
+  if(code==="A"){
+    return ["ТРИВОГА","alert"];
+  }
+  if(code==="P"){
+    return ["ЧАСТКОВА","partial"];
+  }
+  if(code==="N"){
+    return ["НЕМАЄ ДАНИХ","unknown"];
+  }
+  return ["ВІДБІЙ","calm"];
 }
+
+async function loadAlerts(){
+  const box=document.getElementById("regions");
+  box.innerHTML="Завантаження...";
+
+  try{
+    const response=await fetch(API_BASE+"/api/alerts");
+
+    if(!response.ok){
+      throw new Error("API "+response.status);
+    }
+
+    const data=await response.json();
+
+    let html="";
+
+    regions.forEach((name,i)=>{
+      const code=data.statuses[String(i)] || "N";
+      const info=statusInfo(code);
+
+      html+=`
+        <div class="region">
+          <b>${name}</b>
+          <span class="badge ${info[1]}">${info[0]}</span>
+        </div>
+      `;
+    });
+
+    box.innerHTML=html;
+
+    const time=new Date(data.updated_at);
+
+    document.getElementById("updated").textContent=
+      "Оновлено: "+time.toLocaleString("uk-UA");
+
+  }catch(error){
+
+    box.innerHTML=
+      '<div class="badge unknown">Не вдалося отримати дані</div>';
+
+    document.getElementById("updated").textContent=
+      "Помилка з'єднання з сервером";
+  }
+}
+
+loadAlerts();
+
+setInterval(loadAlerts,60000);
 </script>
+
 </body>
 </html>
